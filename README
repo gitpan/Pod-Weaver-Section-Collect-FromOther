@@ -1,0 +1,32 @@
+NAME
+    Pod::Weaver::Section::Collect::FromOther - Import sections from other
+    POD
+
+VERSION
+    version 0.001
+
+DESCRIPTION
+    Copy chunks of POD from other documents, and incorporate them.
+
+SEE ALSO
+    Pod::Weaver, Pod::Weaver::Section::Collect
+
+BUGS
+    All complex software has bugs lurking in it, and this module is no
+    exception.
+
+    Bugs, feature requests and pull requests through GitHub are most
+    welcome; our page and repo (same URI):
+
+        https://github.com/RsrchBoy/pod-weaver-section-collect-fromother
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+
