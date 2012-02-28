@@ -9,7 +9,7 @@
 #
 package Pod::Weaver::Section::Collect::FromOther;
 {
-  $Pod::Weaver::Section::Collect::FromOther::VERSION = '0.001'; # TRIAL
+  $Pod::Weaver::Section::Collect::FromOther::VERSION = '0.002';
 }
 
 # ABSTRACT: Import sections from other POD
@@ -17,7 +17,7 @@ package Pod::Weaver::Section::Collect::FromOther;
 use Moose;
 use namespace::autoclean;
 
-use Moose::Autobox; # XXX I'm... hesitant.
+use Moose::Autobox;
 
 use Path::Class;
 
@@ -27,13 +27,14 @@ use Pod::Elemental;
 use Pod::Elemental::Document;
 use Pod::Elemental::Element::Pod5::Command;
 use Pod::Elemental::Transformer::Gatherer;
+use Pod::Elemental::Transformer::List::Converter;
 
 use Pod::Weaver::Plugin::EnsurePod5;
 use Pod::Weaver::Section::Collect;
 
+# debugging...
 #use Smart::Comments '###';
 
-# XXX plugin roles...
 with
     'Pod::Weaver::Role::Preparer',
     ;
@@ -47,6 +48,7 @@ has header => (
     required => 1,
     default  => sub { shift->plugin_name },
 );
+
 
 sub prepare_input {
     my ($self, $input) = @_;
@@ -95,6 +97,7 @@ sub _find_module {
     die "Cannot find $module in \@INC?!";
 }
 
+
 sub copy_sections_from_other {
     my ($self, $module, $header_text, $command) = @_;
 
@@ -106,6 +109,7 @@ sub copy_sections_from_other {
     my $other_doc = Pod::Elemental->read_file($fn);
     Pod::Elemental::Transformer::Pod5->new->transform_node($other_doc);
 
+    my $list_transform = Pod::Elemental::Transformer::List::Converter->new;
     my $nester = Pod::Elemental::Transformer::Nester->new({
          top_selector      =>  s_command('head1'),
          content_selectors => [
@@ -121,8 +125,9 @@ sub copy_sections_from_other {
 
     ### attack \$other_doc!...
     my @newbies;
-    my $found_command = 0;
+    my $found_command = ($command || q{}) eq 'all' ? 1 : 0;
 
+    $list_transform->transform_node($other_doc);
     $nester->transform_node($other_doc);
     $other_doc->children->each_value(sub {
 
@@ -151,30 +156,76 @@ __PACKAGE__->meta->make_immutable;
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Pod::Weaver::Section::Collect::FromOther - Import sections from other POD
 
 =head1 VERSION
 
-version 0.001
+This document describes 0.002 of Pod::Weaver::Section::Collect::FromOther - released February 28, 2012 as part of Pod-Weaver-Section-Collect-FromOther.
 
 =head1 DESCRIPTION
 
-Copy chunks of POD from other documents, and incorporate them.
+Copy chunks of POD from other documents, and incorporate them.  Our purpose
+here is to enable the easy documentation of packages that serve to combine
+parts of preexisting packages (and thus preexisting documentation).
+
+=head1 METHODS
+
+=head2 prepare_input($input)
+
+Check the given C<$input> for any commands that would trigger us, and
+extract/insert pod as requested.
+
+=head2 copy_sections_from_other($module, $header_text, $opts)
+
+Loads the POD from C<$module> (specified as a package name, in our
+C<@INC>), looks for a C<=head1> section with C<$header_text>, and copies
+everything pulls it out until the next C<=head1> section.
+
+We return the elements we find from the first command until the next section;
+this is to enable preface text to be skipped.  This behaviour can be altered
+by setting C<$opts> to 'all';
+
+We return a series of elements suitable for inclusion directly into another
+document. Note that if this set includes a list, that list will be converted,
+with each C<=item> command becoming a C<=head2>.
 
 =head1 SEE ALSO
 
-L<Pod::Weaver>, L<Pod::Weaver::Section::Collect>
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Pod::Weaver>
+
+=item *
+
+L<Pod::Weaver::Section::Collect>
+
+=item *
+
+L<L<Reindeer> uses this package to collect documentation from various sources.|L<Reindeer> uses this package to collect documentation from various sources.>
+
+=back
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/RsrchBoy/pod-weaver-section-collect-fromother>
+and may be cloned from L<git://github.com/RsrchBoy/pod-weaver-section-collect-fromother.git>
 
 =head1 BUGS
 
-All complex software has bugs lurking in it, and this module is no exception.
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/RsrchBoy/pod-weaver-section-collect-fromother/issues
 
-Bugs, feature requests and pull requests through GitHub are most welcome; our
-page and repo (same URI):
-
-    https://github.com/RsrchBoy/pod-weaver-section-collect-fromother
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

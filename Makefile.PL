@@ -14,6 +14,9 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "File::Find" => 0,
     "File::Temp" => 0,
+    "FindBin" => 0,
+    "Pod::Weaver" => 0,
+    "Test::Differences" => 0,
     "Test::More" => "0.88",
     "strict" => 0,
     "warnings" => 0
@@ -35,12 +38,13 @@ my %WriteMakefileArgs = (
     "Pod::Elemental::Element::Pod5::Command" => 0,
     "Pod::Elemental::Selectors" => 0,
     "Pod::Elemental::Transformer::Gatherer" => 0,
+    "Pod::Elemental::Transformer::List::Converter" => 0,
     "Pod::Weaver::Plugin::EnsurePod5" => 0,
     "Pod::Weaver::Role::Preparer" => 0,
     "Pod::Weaver::Section::Collect" => 0,
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
